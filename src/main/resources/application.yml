@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+zuul:
+  routes:
+#    authortication:
+#      path: /login/**
+#      url: http://127.0.0.1:8080/
+#      sensitiveHeaders: Cookie,Set-Cookie
+#      stripPrefix: false
+    api-apple:
+      path: /apple/**
+      url: http://127.0.0.1:9000/
+    api-banana:
+      path: /banana/**
+      url: http://127.0.0.1:8082/  
+      
+jwt:
+  header: Authorization
+  secret: mySecret
+  expiration: 604800
+  route:
+    authentication:
+      path: auth
+      refresh: refresh
