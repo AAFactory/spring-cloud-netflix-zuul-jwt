@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 
 import io.github.aafactory.zuul.SimpleFilter;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"io.github.aafactory"})
 @EnableZuulProxy
 public class Application {
 
