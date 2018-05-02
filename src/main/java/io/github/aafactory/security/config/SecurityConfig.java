@@ -13,6 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import io.github.aafactory.auth.service.MultyUserDetailsService;
 import io.github.aafactory.auth.user.JwtUserFactory;
@@ -80,7 +83,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/**/*.js"
         ).permitAll()
         .antMatchers("/auth/**").permitAll()
-        .anyRequest().authenticated();
+        .anyRequest().authenticated()
+        .and().cors();;
 
 		// Custom JWT based security filter
 //		httpSecurity
@@ -96,5 +100,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		JwtUserFactory jwtUserFactory = JwtUserFactory.getInstance();
 		jwtUserFactory.setRoleMapper(roleMapper);
 		jwtUserFactory.setUserRoleMapper(userRoleMapper);
+    }
+    
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
