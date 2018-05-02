@@ -7,11 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Date;
 
-/**
- * Created by liumapp on 2/2/18.
- * E-mail:liumapp.com@gmail.com
- * home-page:http://www.liumapp.com
- */
 public class JwtUser implements UserDetails {
 
     private final Long id;

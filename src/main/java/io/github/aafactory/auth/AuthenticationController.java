@@ -2,7 +2,6 @@ package io.github.aafactory.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mobile.device.Device;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,7 +36,7 @@ public class AuthenticationController {
     }
     
     @RequestMapping(value = "${jwt.route.authentication.path}/personal", method = RequestMethod.POST)
-    public ResponseEntity<?> createPersonalAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest, Device device) throws AuthenticationException {
+    public ResponseEntity<?> createPersonalAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) throws AuthenticationException {
         authenticationRequest.setUsername(authenticationRequest.getPhone());
         // Perform the security
         Authentication authentication = null;
@@ -57,7 +56,7 @@ public class AuthenticationController {
 
         // Reload password post-security so we can generate token
         final UserDetails userDetails = userDetailsService.loadUserByPhone(authenticationRequest.getPhone());
-        final String token = jwtTokenUtil.generateToken(userDetails, device);
+        final String token = jwtTokenUtil.generateToken(userDetails);
 
         // Return the token
         return ResponseEntity.ok(new JwtAuthenticationResponse(token));

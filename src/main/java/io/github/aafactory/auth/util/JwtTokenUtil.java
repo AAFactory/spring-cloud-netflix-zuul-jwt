@@ -1,27 +1,22 @@
 package io.github.aafactory.auth.util;
 
-import io.github.aafactory.auth.user.JwtUser;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Clock;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.DefaultClock;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mobile.device.Device;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-/**
- * Created by liumapp on 2/2/18.
- * E-mail:liumapp.com@gmail.com
- * home-page:http://www.liumapp.com
- */
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import io.github.aafactory.auth.user.JwtUser;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Clock;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.DefaultClock;
+
 @Component
 public class JwtTokenUtil implements Serializable {
 
@@ -89,29 +84,17 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(clock.now());
     }
 
-    private String generateAudience(Device device) {
-        String audience = AUDIENCE_UNKNOWN;
-        if (device.isNormal()) {
-            audience = AUDIENCE_WEB;
-        } else if (device.isTablet()) {
-            audience = AUDIENCE_TABLET;
-        } else if (device.isMobile()) {
-            audience = AUDIENCE_MOBILE;
-        }
-        return audience;
-    }
-
     private Boolean ignoreTokenExpiration(String token) {
         String audience = getAudienceFromToken(token);
         return (AUDIENCE_TABLET.equals(audience) || AUDIENCE_MOBILE.equals(audience));
     }
 
-    public String generateToken(UserDetails userDetails, Device device) {
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername(), generateAudience(device));
+        return doGenerateToken(claims, userDetails.getUsername());
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject, String audience) {
+    private String doGenerateToken(Map<String, Object> claims, String subject) {
         final Date createdDate = clock.now();
         final Date expirationDate = calculateExpirationDate(createdDate);
 
@@ -120,7 +103,6 @@ public class JwtTokenUtil implements Serializable {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
-                .setAudience(audience)
                 .setIssuedAt(createdDate)
                 .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, secret)

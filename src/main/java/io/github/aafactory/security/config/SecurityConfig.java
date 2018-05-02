@@ -15,22 +15,28 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import io.github.aafactory.auth.service.MultyUserDetailsService;
+import io.github.aafactory.auth.user.JwtUserFactory;
+import io.github.aafactory.mapper.RoleMapper;
+import io.github.aafactory.mapper.UserRoleMapper;
 
-
-/**
- * Created by liumapp on 2/2/18.
- * E-mail:liumapp.com@gmail.com
- * home-page:http://www.liumapp.com
- */
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+//	@Autowired
+//    private JwtAuthenticationEntryPoint unauthorizedHandler;
+
     @Autowired
     private MultyUserDetailsService userDetailsService;
-    
+
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
+
     @Autowired
     public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
@@ -51,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+    	httpSecurity
         // we don't need CSRF because our token is invulnerable
         .csrf().disable()
 
@@ -75,5 +81,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         ).permitAll()
         .antMatchers("/auth/**").permitAll()
         .anyRequest().authenticated();
+
+		// Custom JWT based security filter
+//		httpSecurity
+//		        .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+		
+		// disable page caching
+		httpSecurity
+		        .headers()
+		        .frameOptions().sameOrigin()  // required to set for H2 else H2 Console will be blank.
+		        .cacheControl();
+		
+		// built jwt user factory
+		JwtUserFactory jwtUserFactory = JwtUserFactory.getInstance();
+		jwtUserFactory.setRoleMapper(roleMapper);
+		jwtUserFactory.setUserRoleMapper(userRoleMapper);
     }
 }
